@@ -12,8 +12,6 @@ print(a + b)
 print("Hemos terminado nuestras actividades Hacker")
 
 print(pc.multiplicar(300, 20))
-
 print(pc.C)
 print(pc.PI)
-
 print(pc.vol_cilindro(40, 60))
