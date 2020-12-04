@@ -1,3 +1,1 @@
-from .calculos import *
-from .otro_script import *
-
+from utils import PI, C
