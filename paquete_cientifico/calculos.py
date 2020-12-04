@@ -65,7 +65,4 @@ def vol_cilindro(altura, area_base):
     volumen = altura*area_base
     return volumen
 
-import nuevos_calculos
-
-nuevos_calculos.a_p_rectangulo()
-
+import paquete_cientifico.nuevos_calculos
