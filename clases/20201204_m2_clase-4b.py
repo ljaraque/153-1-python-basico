@@ -1,5 +1,4 @@
 # función range()
-
 rango = range(3,10)
 print(list(rango))
 
