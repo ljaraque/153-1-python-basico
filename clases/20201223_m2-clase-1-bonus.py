@@ -6,7 +6,7 @@ class Cliente:
         self.__id = uuid4()
         self.__nombre = nombre
         self.__saldo = saldo
-        self.__atributos = self.atributos
+        self.__atributos = []
     
     def girar(self, monto):
         self.__saldo -= monto
@@ -44,44 +44,64 @@ class Cliente:
 class Financiera:
 
     def __init__(self, nombre, saldo_institucional):
-        self.id = uuid4()
-        self.nombre = nombre
-        self.saldo_institucional = saldo_institucional
-        self.clientes = list()
-        self.sumatoria_lineas_credito = 0
+        self.__id = uuid4()
+        self.__nombre = nombre
+        self.__saldo_institucional = saldo_institucional
+        self.__clientes = list()
+        self.__sumatoria_lineas_credito = 0
+
+    @property
+    def id(self):
+        return self.__id
+
+    @property
+    def nombre(self):
+        return self.__nombre
+
+    @property
+    def saldo_institucional(self):
+        return self.__saldo_institucional
+
+    @property
+    def clientes(self):
+        return self.__clientes
+
+    @property
+    def sumatoria_lineas_credito(self):
+        return self.__sumatoria_lineas_credito
 
     def agregar_cliente(self, cliente):
-        if self.sumatoria_lineas_credito <= 0.1*self.saldo_institucional: 
-            cliente.financiera = self.nombre
+        if self.__sumatoria_lineas_credito <= 0.1*self.__saldo_institucional: 
+            cliente.financiera = self.__nombre 
             cliente.linea_credito = 1000000
-            self.sumatoria_lineas_credito += 1000000
-            self.clientes.append(cliente)
-            return self.clientes
+            self.__sumatoria_lineas_credito += 1000000
+            self.__clientes.append(cliente)
+            return self.__clientes
 
         else:
             raise Exception("Lo Lamentamos, no hay capacidad de asignar lineas de crédito!")
             
     
     def eliminar_cliente(self, id_cliente):
-        for index, cliente in enumerate(self.clientes):
+        for index, cliente in enumerate(self.__clientes):
             if cliente.id == id_cliente:
                 delattr(cliente, "financiera")
                 delattr(cliente, "linea_credito")
-                self.clientes.pop(index)
-                return self.clientes
+                self.__clientes.pop(index)
+                return self.__clientes
     
     def transferir(self, id_origen, id_destino, monto):
         # revisamos si financiera es origen o destino
-        if id_origen == self.id:
+        if id_origen == self.__id:
             origen = self
-        elif id_destino == self.id:
+        elif id_destino == self.__id:
             destino = self
 
         # como financiera no es origen ni destino entonce
         # se revisa si ambos son clientes
         cliente_origen_encontrado = False
         cliente_destino_encontrado = False
-        for cliente in self.clientes:
+        for cliente in self.__clientes:
             if cliente.id == id_origen:
                 origen = cliente
                 cliente_origen_encontrado = True
@@ -105,25 +125,42 @@ class Financiera:
                     if isinstance(destino, Cliente):
                         destino.saldo += monto
                     elif isinstance(destino, Financiera): 
-                        destino.saldo_institucional += monto
+                        destino.__saldo_institucional += monto
                     origen.saldo -= monto
                 else:
                     raise Exception("El cliente de origen no tiene saldo suficiente!")
             else:
-                if (origen.saldo_institucional-monto)*.1 >= self.sumatoria_lineas_credito:
+                if (origen.__saldo_institucional-monto)*.1 >= self.__sumatoria_lineas_credito:
                     destino.saldo += monto
-                    origen.saldo_institucional -= monto
+                    origen.__saldo_institucional -= monto
                 else:
                     raise Exception("La financiera de origen no tiene saldo suficiente!")
-
         
     def giros_totales(self):
         pass
 
+    def resumen_clientes(self):
+        '''
+        Imprime lista de clientes de financiera
+        con nombre, id parcial y saldo
+        '''
+        lista_datos_clientes = list()
+        for cliente in self.clientes:
+            lista_datos_clientes.append([str(cliente.id)[:5], cliente.saldo, cliente.nombre])
+        return lista_datos_clientes
+
+    def maximo_transferible(self):
+        maximo_monto_transferible = (self.__saldo_institucional 
+                - self.__sumatoria_lineas_credito/0.1)
+        return maximo_monto_transferible
 
 if __name__ == "__main__":
+
+    # Se instancian 2 financieras
     financiera_1 = Financiera("Saka Lukas", 100000000)
     financiera_2 = Financiera("Banco de Talca", 100000000)
+
+    # Se instancian 8 clientes
     cliente_1 = Cliente("Wolverine", 500000)
     cliente_2 = Cliente("Ciclope", 400000)
     cliente_3 = Cliente("Snoopy", 300000)
@@ -132,43 +169,50 @@ if __name__ == "__main__":
     cliente_6 = Cliente("Perro Firulais", 200000)
     cliente_7 = Cliente("Chupacabras", 100000)
     cliente_8 = Cliente("Baby Yoda", 700000)
+
+    # Se agrupan clientes en listas de 4 unidades
     clientes_grupo_a = [cliente_1, cliente_2, cliente_3, cliente_4]
     clientes_grupo_b = [cliente_5, cliente_6, cliente_7, cliente_8]
 
+    # Se dan de alta los clientes del grupo_a en financiera_1
     for cliente in clientes_grupo_a:
         financiera_1.agregar_cliente(cliente)
 
+    # Se dan de alta los clientes del grupo_b en financiera_2
     for cliente in clientes_grupo_b:
         financiera_2.agregar_cliente(cliente)
 
-
-    def imprimir_clientes():
-        for cliente in financiera_1.clientes:
-            print(cliente.nombre, "\n", cliente.id, cliente.saldo)
-
-        for cliente in financiera_2.clientes:
-            print(cliente.nombre, "\n", cliente.id, cliente.saldo)
-
-    imprimir_clientes()
+    # Se imprime resumen de clientes (id parcial, saldo y nombre) 
+    # de financiera_1
+    print("\nSaldos de clientes antes de transferencia")
+    for cliente in financiera_1.resumen_clientes():
+        print(cliente)
   
-    print("Sumatoria LC", financiera_1.sumatoria_lineas_credito)
-    financiera_1.transferir(financiera_1.id, cliente_2.id, 60000000)
-    print()
-    imprimir_clientes()
+    # Calcula máximo monto que financiera puede transferir
+    maximo_monto_transferible_1 = financiera_1.maximo_transferible()
+    print("\nEl máximo monto transferible es: ", maximo_monto_transferible_1)
 
-
-    print(cliente_1.atributos)
+    # Transfiere el máximo monto transferible de financiera_1
+    financiera_1.transferir(financiera_1.id, cliente_2.id, 
+            maximo_monto_transferible_1)
+ 
+    print("\nSaldos de clientes antes de transferencia")
+    for cliente in financiera_1.resumen_clientes():
+        print(cliente)
 
 
     # Prueba de eliminación de cliente desde financiera
     # Pierde nombre financiera y linea_credito
-    print("\n\n==> PROBANDO ELIMINACIÓN DE CLIENTE")
+    print("\n\nPROBANDO ELIMINACIÓN DE CLIENTE")
     print("\nAtributos del cliente_1 antes de ser eliminado")
-    print("Ojo existen linea_credito y financiera pues aún pertenece a financiera")
+    print("Aún están linea_credito y financiera")
+    print("pues aún pertenece a financiera")
     print(cliente_1.atributos)
 
+    # Elimina cliente_1 de financiera_1
     financiera_1.eliminar_cliente(cliente_1.id)
 
     print("\n\nAtributos del cliente_1 después de ser eliminado")
-    print("ya no existen linea_credito y financiera pues aún pertenece a financiera")
+    print("ya no existen linea_credito y financiera pues ya no")
+    print("pertenece a financiera")
     print(cliente_1.atributos)
