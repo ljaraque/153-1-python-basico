@@ -79,7 +79,7 @@ class Financiera:
             return self.__clientes
 
         else:
-            raise Exception("Lo Lamentamos, no hay capacidad de asignar lineas de crédito!")
+            raise Exception("Error:No hay capacidad para lineas de crédito!")
             
     
     def eliminar_cliente(self, id_cliente):
@@ -128,13 +128,15 @@ class Financiera:
                         destino.__saldo_institucional += monto
                     origen.saldo -= monto
                 else:
-                    raise Exception("El cliente de origen no tiene saldo suficiente!")
+                    raise Exception("Cliente origen con saldo insuficiente!")
             else:
-                if (origen.__saldo_institucional-monto)*.1 >= self.__sumatoria_lineas_credito:
+                if ((origen.__saldo_institucional-monto)*.1 
+                            >= self.__sumatoria_lineas_credito):
                     destino.saldo += monto
                     origen.__saldo_institucional -= monto
                 else:
-                    raise Exception("La financiera de origen no tiene saldo suficiente!")
+                    message = "Financiera de origen con saldo insuficiente!"
+                    raise Exception(message)
         
     def giros_totales(self):
         pass
@@ -146,7 +148,9 @@ class Financiera:
         '''
         lista_datos_clientes = list()
         for cliente in self.clientes:
-            lista_datos_clientes.append([str(cliente.id)[:5], cliente.saldo, cliente.nombre])
+            lista_datos_clientes.append([str(cliente.id)[:5], 
+                                cliente.saldo, 
+                                cliente.nombre])
         return lista_datos_clientes
 
     def maximo_transferible(self):
