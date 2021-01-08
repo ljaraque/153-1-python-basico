@@ -62,6 +62,7 @@ with open('data/iris.csv', 'r') as file:
     print("Calculado promedio de sepal_length:", acumulador/contador)
 '''
 
+'''
 import csv
 with open('data/iris.csv', 'r') as file:
     reader = csv.DictReader(file)
@@ -85,7 +86,7 @@ with open('data/iris.csv', 'r') as file:
             print("Linea buscada", linea)
     
 
-
+ perform actions on them. 
     exit()
     #for linea in reader:
     #    print(linea)
@@ -98,4 +99,57 @@ with open('data/iris.csv', 'r') as file:
     file.seek(0)
     print("petal_length de línea 100:", list(reader)[100]['petal_length'])
 
-    
+'''
+
+"""
+# Ejemplo5: uso de pickle
+
+import pickle
+
+
+class Arbol:
+    def __init__(self, altura):
+        self.componente_quimico=self.__calculo()
+        self.altura=altura
+        
+    def crecer(self, cuanto):
+        self.altura += cuanto
+        
+    def __calculo(self):
+        #llamar a base de datos masiva y hace un calculo que demora 24 hora
+        pass
+
+#arbol1= Arbol(10)
+
+'''
+with open("data/datos_pickle", 'wb') as file:
+    pickle.dump(arbol1, file)
+'''
+
+with open("data/dato'''
+with open("data/datos_pickle", 'wb') as file:
+    pickle.dump(arbol1, file)
+'''s_pickle", 'rb') as file:
+    data_cargada = pickle.load(file)
+print(data_cargada)
+
+print(data_cargada.altura)
+"""
+
+'''
+#ejemplo6: Archivo JSON
+import json
+
+with open('data/datos.json') as archivo:
+    linea = archivo.readline()
+
+data = json.loads(linea) # crea un diccionario
+
+print(data['albums']['titulos'][0])
+
+data['albums']['titulos'].append("Improvisación")
+
+with open('data/datos.json', 'w') as archivo:
+    string_json = json.dumps(data) # creo un string json desde el diccionario python
+    archivo.write(string_json)
+'''
